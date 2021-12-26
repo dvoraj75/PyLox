@@ -5,9 +5,9 @@ from token_ import Token, TokenTypes, SINGLE_TOKENS, ONE_TWO_TOKENS, KEYWORDS
 
 class Scanner:
     def __init__(self, source: str):
-        self.__source = source
-        self.line = 1
-        self.current = 0
+        self.__source: str = source
+        self.line: int = 1
+        self.current: int = 0
 
     def scan_tokens(self) -> List[Token]:
         tokens = []
@@ -20,9 +20,12 @@ class Scanner:
             elif token_type := ONE_TWO_TOKENS.get(c):
                 # >,>=,<,<=, !, !=, ==, /, //
                 self.current += 1
-                if c == "/" and self.match("/"):
-                    while not self.match('\n') and not self.is_at_end():
-                        self.current += 1
+                if c == "/":
+                    if self.match("/"):
+                        while not self.match('\n') and not self.is_at_end():
+                            self.current += 1
+                    else:
+                        tokens.append(Token(token_type, c, None, self.line))
                     continue
                 elif self.match("="):
                     c += "="
@@ -81,10 +84,10 @@ class Scanner:
             self.current += 1
         return tokens
 
-    def is_at_end(self):
+    def is_at_end(self) -> bool:
         return self.current >= len(self.__source)
 
-    def match(self, c):
+    def match(self, c: str) -> bool:
         if self.is_at_end():
             return False
         return self.__source[self.current] == c
